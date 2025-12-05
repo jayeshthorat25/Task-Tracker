@@ -13,7 +13,7 @@ def create_tables():
 create_tables()
 
 origins = [
-    "http://localhost:5173"]
+    "http://localhost:5173", "http://localhost:5174",]
 
 app.add_middleware(
   CORSMiddleware,

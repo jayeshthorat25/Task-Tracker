@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import api from "../api/api";
+import { getAccessToken} from "../services/authService";
 import { set } from "date-fns";
 
 export const AuthContext = createContext(null);
@@ -9,41 +10,68 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-
+  const refreshAccessToken = async () => {
     setLoading(true);
+    try {
+      const token = await getAccessToken();
+      console.log("Token refreshed:", token);
+      setAuthToken(token);
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      removeAuthToken();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     const storedAccessToken = localStorage.getItem("accessToken");
-    const storedUser = localStorage.getItem("user");
 
-    // console.log("AuthProvider mounted. Stored accessToken:", storedAccessToken);
-    // console.log("AuthProvider mounted. Stored user:", storedUser);
-    
-
-    if (storedUser &&  storedAccessToken) {
+    if (storedAccessToken) {
       setAccessToken(storedAccessToken);
-      setUser(JSON.parse(storedUser));
+    } else {
+      refreshAccessToken();
     }
-
-    if (!storedUser || !storedAccessToken) {
-      setAccessToken(null);
-      setUser(null);
-    }
-
     setLoading(false);
   }, []);
+  
+  const getUser = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get("/auth/me");
+      const user = response.data;
+      console.log("Fetched user after token refresh:", user);
+      setUser(user);
+      // Store updated values
+      // localStorage.setItem("user", JSON.stringify(user));
+    }catch (error) {
+      console.error("Error fetching user:", error);
+      removeAuthToken();
+      toast.error("Session expired. Please log in again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const setAuthToken = (accessToken, user) => {
+  useEffect(() => {
+    if (accessToken && !user) {
+      getUser();
+    }
+  }, [accessToken, user]);
+
+  const setAuthToken = (accessToken) => {
+    setLoading(true);
     setAccessToken(accessToken);
-    setUser(user);
+    getUser();
     localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("user", JSON.stringify(user));
+    setLoading(false);
   };
 
   const removeAuthToken = () => {
     setAccessToken(null);
     setUser(null);
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("user");
+    // localStorage.removeItem("user");
   };
 
   return (
