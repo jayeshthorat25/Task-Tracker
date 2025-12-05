@@ -1,15 +1,18 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
 import { Outlet } from "react-router-dom";
 import api from "../api/api";
 import { Circle, TrendingUp, Zap } from "lucide-react";
 import StatCard from "./StatCard";
+import { AuthContext } from "../context/AuthContext";
 
-function Layout({ user }) {
+function Layout() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const { user } = useContext(AuthContext);
 
   const fetchTasks = useCallback(
     async (url) => {

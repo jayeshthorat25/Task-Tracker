@@ -6,7 +6,6 @@ import { toast } from "react-toastify";
 
 const API_BASE_URL = "http://localhost:8000/api";
 
-
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -42,7 +41,19 @@ api.interceptors.response.use(
 
   async (error) => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry && !originalRequest.url.includes("/auth/refresh")) {
+
+    if (
+      originalRequest.url.includes("/auth/login") ||
+      originalRequest.url.includes("/auth/signup")
+    ) {
+      return Promise.reject(error);
+    }
+
+    if (
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes("/auth/refresh")
+    ) {
       originalRequest._retry = true;
       try {
         const refreshResponse = await api.post(
@@ -57,7 +68,9 @@ api.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("user");
-        toast.error("Session expired. Redirecting to login...", { autoClose: 3000 });
+        toast.error("Session expired. Redirecting to login...", {
+          autoClose: 3000,
+        });
         // redirectToLogin()
         setTimeout(() => {
           window.location.href = "/login";
@@ -73,4 +86,3 @@ api.interceptors.response.use(
 export default api;
 
 export { apiPublic };
-
