@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
 from core.enums import UserRole, TaskStatus, TaskPriority
@@ -9,7 +9,7 @@ class UserBase(BaseModel):
     role: Optional[UserRole] = UserRole.USER
 
 class UserCreate(UserBase):
-    password: str
+    password: str = Field(..., min_length=6, description="Password must be at least 6 characters long")
     
 class UserLogin(BaseModel):
     email: EmailStr
@@ -51,4 +51,3 @@ class TaskStatusUpdate(BaseModel):
 #     email: Optional[str] = None
 #     password: Optional[str] = None
 #     role: Optional[str] = None
-    

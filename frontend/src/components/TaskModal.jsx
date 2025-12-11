@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 
-
 const priorityStyles = {
   low: "bg-green-100 text-green-700 border-green-200",
   medium: "bg-purple-100 text-purple-700 border-purple-200",
@@ -37,7 +36,12 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
         description: taskToEdit.description || "",
         priority: taskToEdit.priority || "Low",
         dueDate: taskToEdit.due_date ? taskToEdit.due_date.split("T")[0] : "",
-        completed: taskToEdit.status === "completed" ? "completed" : taskToEdit.status === "pending" ? "pending" : "in_progress",
+        completed:
+          taskToEdit.status === "completed"
+            ? "completed"
+            : taskToEdit.status === "pending"
+            ? "pending"
+            : "in_progress",
         id: taskToEdit.id || null,
       });
     } else {
@@ -64,7 +68,12 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
         description: taskData.description,
         priority: taskData.priority.toLowerCase(),
         due_date: taskData.dueDate,
-        status: taskData.completed === "completed" ? "completed" : taskData.completed === "in_progress" ? "in_progress" : "pending",
+        status:
+          taskData.completed === "completed"
+            ? "completed"
+            : taskData.completed === "in_progress"
+            ? "in_progress"
+            : "pending",
       };
       if (taskData.id) {
         // Edit existing task
@@ -82,7 +91,7 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
       onClose();
     } catch (err) {
       setError("Failed to save task. Please try again.");
-      console.log("Error saving task:", err);
+      // console.log("Error saving task:", err);
       setLoading(false);
     }
   };
@@ -94,6 +103,39 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
       [name]: value,
     }));
   }, []);
+
+  const displayDueDate = () => {
+    if (!task?.due_date)
+      return <span className="text-gray-400 italic">No Due Date</span>;
+
+    const dueDate = new Date(task.due_date);
+    const today = new Date();
+    const isCompleted = task.status?.toLowerCase() === "completed";
+
+    if (isToday(dueDate)) {
+      return (
+        <span className="text-orange-500 font-medium flex items-center gap-1">
+          <AlertTriangle size={16} className="text-orange-500" />
+          Due Today
+        </span>
+      );
+    }
+
+    if (isBefore(dueDate, today) && !isCompleted) {
+      return (
+        <span className="text-red-600 font-semibold flex items-center gap-1">
+          <AlertTriangle size={18} className="text-red-600" />
+          Overdue - {format(dueDate, "MMM d, yyyy")}
+        </span>
+      );
+    }
+
+    return (
+      <span className="text-blue-500 font-medium">
+        Due {format(dueDate, "MMM d, yyyy")}
+      </span>
+    );
+  };
 
   if (!isOpen) return null;
 
@@ -112,7 +154,6 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
             <X className="w-5 h-5" />
           </button>
         </div>
-
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
@@ -182,7 +223,7 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
                 name="dueDate"
                 value={taskData.dueDate}
                 required
-                min={today}
+                min={taskToEdit ? taskToEdit.due_date : today}
                 onChange={handleChange}
                 className="w-full px-4 py-2.5 border border-purple-100 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-sm"
               />

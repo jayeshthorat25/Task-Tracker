@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException , Depends
+from fastapi import APIRouter, HTTPException , Depends, Query
 from database.db import get_session
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from models.models import Task
 from schemas.schemas import TaskResponse
@@ -24,9 +25,23 @@ async def get_all_tasks(id: int = None, status: str = None, current_user: User =
   return tasks
 
 @router.get("/all_users")
-async def get_all_users(current_user: User = Depends(check_admin_role), session: Session = Depends(get_session)):
-  users = session.query(User).all()
-  return users
+async def get_all_users(
+    search: str = Query("", alias="search"),
+    current_user: User = Depends(check_admin_role),
+    session: Session = Depends(get_session),
+):
+    query = session.query(User)
+
+    # If search term provided → filter by name or email
+    if search:
+        search_pattern = f"%{search.lower()}%"
+        query = query.filter(
+            func.lower(User.name).like(search_pattern) |
+            func.lower(User.email).like(search_pattern)
+        )
+
+    users = query.all()
+    return users
 
 @router.get("/user/{user_id}")
 async def get_user(user_id: int, current_user: User = Depends(check_admin_role), session: Session = Depends(get_session)):

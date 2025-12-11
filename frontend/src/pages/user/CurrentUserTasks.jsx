@@ -52,7 +52,15 @@ function Dashboard() {
     },
   ];
 
-  const FILTER_OPTIONS = ["all", "today", "week", "high", "medium", "low"];
+  const FILTER_OPTIONS = [
+    { value: "all", label: "All Tasks" },
+    { value: "today", label: "Today" },
+    { value: "week", label: "This Week" },
+    { value: "high", label: "High Priority" },
+    { value: "medium", label: "Medium Priority" },
+    { value: "low", label: "Low Priority" },
+  ];
+
   const FILTER_LABELS = {
     all: "All Tasks",
     today: "Today's Tasks",
@@ -101,12 +109,12 @@ function Dashboard() {
   );
 
   const handleTaskSave = useCallback(async (task) => {
-    try{
-        // Create new task
-        await api.post(`/users/tasks`, task);
-        refreshTasks();
-        setShowModal(false);
-        setSelectedTask(null);
+    try {
+      // Create new task
+      await api.post(`/users/tasks`, task);
+      refreshTasks();
+      setShowModal(false);
+      setSelectedTask(null);
     } catch (error) {
       console.error("Failed to save task:", error);
     }
@@ -118,11 +126,11 @@ function Dashboard() {
         <div className="min-w-0">
           <h1 className="text-xl md:text-3x1 font-bold text-gray-800 flex items-center gap-2">
             <HomeIcon className="text-purple-500 w-5 h-5 md:w-6 md:h-6 shrink-0" />
-            <span className="truncate">Task Overview</span>
+            <span className="">All Tasks</span>
           </h1>
-          <p className="text-sm text-gray-500 mt-1 ml-7 truncate">
+          {/* <p className="text-sm text-gray-500 mt-1 ml-7 ">
             Manage your tasks efficiently
-          </p>
+          </p> */}
         </div>
         <button
           onClick={() => setShowModal(true)}
@@ -133,78 +141,44 @@ function Dashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
-        {STATS.map(
-          ({
-            key,
-            label,
-            icon: Icon,
-            iconColor,
-            borderColor,
-            valueKey,
-            textColor,
-            gradient,
-          }) => (
-            <div
-              key={key}
-              className={`p-3 md:p-4 rounded-xl bg-white shadow-sm border border-purple-100 hover:shadow-md transition-all duration-300 min-w-0 ${borderColor} `}
-            >
-              <div className="flex items-center gap-2 md:gap-3">
-                <div className={`p-1.5 md:p-2 rounded-lg ${iconColor}`}>
-                  <Icon className="w-4 h-4 md:w-5 md:h-5" />
-                </div>
-                <div className="min-w-0">
-                  <p
-                    className={`text-lg md:text-2xl font-bold truncate ${
-                      gradient
-                        ? "bg-linear-to-r from-fuchsia-500 to-purple-600 bg-clip-text text-transparent"
-                        : textColor
-                    }`}
-                  >
-                    {stats[valueKey]}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{label}</p>
-                </div>
-              </div>
-            </div>
-          )
-        )}
-      </div>
-
       {/* CONTENTS */}
       <div className="space-y-6">
         {/* FILTER */}
         <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
+          {/* Left Label */}
           <div className="flex items-center gap-2 min-w-0">
             <Filter className="w-5 h-5 text-purple-500 shrink-0" />
             <h2 className="text-base md:text-lg font-semibold text-gray-800 truncate">
               {FILTER_LABELS[filter]}
             </h2>
           </div>
+
+          {/* Mobile Dropdown */}
           <select
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="px-3 py-2 border border-purple-100 rounded-lg focus:ring-2 focus:ring-purple-500 md:hidden text-sm"
           >
-            {FILTER_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>
-                {opt.charAt(0).toUpperCase() + opt.slice(1)}
+            {FILTER_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
               </option>
             ))}
           </select>
 
+          {/* Desktop Buttons */}
           <div className="hidden md:flex space-x-1 bg-purple-50 p-1 rounded-lg">
-            {FILTER_OPTIONS.map((opt) => (
+            {FILTER_OPTIONS.map(({ value, label }) => (
               <button
-                key={opt}
-                onClick={() => setFilter(opt)}
+                key={value}
+                onClick={() => setFilter(value)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  filter === opt
+                  filter === value
                     ? "bg-white text-purple-700 shadow-sm border"
                     : "text-gray-600 hover:bg-purple-100/50"
                 }`}
               >
-                {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                {label}
               </button>
             ))}
           </div>

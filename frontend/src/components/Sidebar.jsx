@@ -1,27 +1,50 @@
-import { CheckCircle2, Home, ListChecks, Sparkles, User } from "lucide-react";
+import {
+  CheckCircle2,
+  Clock,
+  Home,
+  LayoutDashboard,
+  ListChecks,
+  ListTodo,
+  Sparkles,
+  User,
+} from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-function Sidebar({user}) {
+function Sidebar({ user }) {
   const username = user.name ? user.name : "User";
   const initial = username.charAt(0).toUpperCase();
 
   // console.log(user.role)
 
   const menuItems = [
-    { text: "All Tasks", path: "/", icon: <Home className="w-5 h-5" /> },
+    {
+      text: "Dashboard",
+      path: "/user/dashboard",
+      icon: <LayoutDashboard className="w-5 h-5" />,
+    },
+    {
+      text: "All Tasks",
+      path: "/user/tasks",
+      icon: <ListTodo className="w-5 h-5" />,
+    },
     {
       text: "Remaining Tasks",
-      path: "/remaining",
-      icon: <ListChecks className="w-5 h-5" />,
+      path: "/user/remaining",
+      icon: <Clock className="w-5 h-5" />,
     },
     {
       text: "Completed Tasks",
-      path: "/complete",
+      path: "/user/complete",
       icon: <CheckCircle2 className="w-5 h-5" />,
     },
   ];
-
+  
   const adminMenuItems = [
+    {
+      text: "Dashboard",
+      path: "/admin/dashboard",
+      icon: <LayoutDashboard className="w-5 h-5" />,
+    },
     {
       text: "All Tasks",
       path: "/admin/tasks",
@@ -31,36 +54,36 @@ function Sidebar({user}) {
       text: "All Users",
       path: "/admin/users",
       icon: <User className="w-5 h-5" />,
-    }
+    },
   ];
 
   const renderMenuItems = () => {
-    const itemsToRender = user.role == "admin" ? adminMenuItems : menuItems
-    return(
-    <ul className="space-y-2">
-      {itemsToRender.map(({ text, path, icon }) => (
-        <li key={text}>
-          <NavLink
-            to={path}
-            className={({ isActive }) =>
-              [
-                "group flex items-center px-4 py-3 rounded-xl transition-all duration-300 lg:justify-start",
-                isActive
-                  ? "bg-linear-to-r from-purple-50 to-fuchsia-50 border-l-4 border-purple-500 text-purple-700 font-medium shadow-sm"
-                  : "hover:bg-purple-50/50 text-gray-600 hover:text-purple-700",
-              ].join(" ")
-            }
-          >
-            <span className="transition-transform duration-300 group-hover:scale-110 text-purple-500">
-              {icon}
-            </span>
-            <span className="text-sm font-medium ml-2">{text}</span>
-          </NavLink>
-        </li>
-      ))}
-    </ul>
-    )
-  }
+    const itemsToRender = user.role == "admin" ? adminMenuItems : menuItems;
+    return (
+      <ul className="space-y-2">
+        {itemsToRender.map(({ text, path, icon }) => (
+          <li key={text}>
+            <NavLink
+              to={path}
+              className={({ isActive }) =>
+                [
+                  "group flex items-center px-4 py-3 rounded-xl transition-all duration-300 lg:justify-start",
+                  isActive
+                    ? "bg-linear-to-r from-purple-50 to-fuchsia-50 border-l-4 border-purple-500 text-purple-700 font-medium shadow-sm"
+                    : "hover:bg-purple-50/50 text-gray-600 hover:text-purple-700",
+                ].join(" ")
+              }
+            >
+              <span className="transition-transform duration-300 group-hover:scale-110 text-purple-500">
+                {icon}
+              </span>
+              <span className="text-sm font-medium ml-2">{text}</span>
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    );
+  };
 
   return (
     <div className="hidden md:flex flex-col fixed h-full w-20 lg:w-64 bg-white/90 backdrop-blur-sm border-r border-purple-100 shadow-sm z-20 transition-all duration-300">
@@ -71,7 +94,9 @@ function Sidebar({user}) {
           </div>
 
           <div>
-            <h2 className="text-lg font-bold text-gray-800">Hey, {user && username}</h2>
+            <h2 className="text-lg font-bold text-gray-800">
+              Hey, {user && username}
+            </h2>
             <p className="text-sm text-purple-500 font-medium flex items-center gap-1">
               <Sparkles className="w-3 h-3" /> Welcome Back!
             </p>
@@ -79,7 +104,6 @@ function Sidebar({user}) {
         </div>
       </div>
       {renderMenuItems()}
-
     </div>
   );
 }
