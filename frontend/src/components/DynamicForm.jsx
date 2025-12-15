@@ -1,3 +1,6 @@
+import React from "react";
+import FormInput from "./FormInput";
+
 const DynamicForm = ({
   fields = [],
   values = {},
@@ -11,7 +14,7 @@ const DynamicForm = ({
   selectClass = "",
   textareaClass = "",
   buttonClass = "",
-  ButtonIcon
+  ButtonIcon,
 }) => {
   return (
     <form onSubmit={onSubmit} className={formClass}>
@@ -24,82 +27,20 @@ const DynamicForm = ({
             {field.label}
           </label>
 
-          {/* TEXT INPUT */}
-          {field.type === "text" || field.type === "email" || field.type === "password" ? (
-            <input
-              type={field.type}
-              name={field.name}
-              value={values[field.name] || ""}
-              onChange={onChange}
-              placeholder={field.placeholder}
-              className={inputClass}
-              required={field.required}
-            />
-          ) : null}
-
-          {/* TEXTAREA */}
-          {field.type === "textarea" && (
-            <textarea
-              name={field.name}
-              rows={field.rows || 2}
-              value={values[field.name] || ""}
-              onChange={onChange}
-              placeholder={field.placeholder}
-              className={textareaClass}
-            />
-          )}
-
-          {/* SELECT */}
-          {field.type === "select" && (
-            <select
-              name={field.name}
-              value={values[field.name]}
-              onChange={onChange}
-              className={selectClass}
-            >
-              {field.options.map((opt) => (
-                <option key={opt.value} value={opt.value} className={opt.className}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          )}
-
-          {/* DATE */}
-          {field.type === "date" && (
-            <input
-              type="date"
-              name={field.name}
-              min={field.min}
-              value={values[field.name] || ""}
-              onChange={onChange}
-              className={inputClass}
-              required={field.required}
-            />
-          )}
-
-          {/* RADIO GROUP */}
-          {field.type === "radio-group" && (
-            <div className={radioGroupClass}>
-              {field.options.map((option) => (
-                <label key={option.value} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name={field.name}
-                    value={option.value}
-                    checked={values[field.name] === option.value}
-                    onChange={onChange}
-                  />
-                  <span>{option.label}</span>
-                </label>
-              ))}
-            </div>
-          )}
+          <FormInput
+            field={field}
+            value={values[field.name]}
+            onChange={onChange}
+            inputClass={inputClass}
+            textareaClass={textareaClass}
+            selectClass={selectClass}
+            radioGroupClass={radioGroupClass}
+          />
         </div>
       ))}
 
       <button type="submit" className={buttonClass}>
-        {/* <ButtonIcon /> */}
+        {ButtonIcon && <ButtonIcon className="w-4 h-4 mr-2" />}
         {submitLabel}
       </button>
     </form>

@@ -260,7 +260,7 @@ import {
   Save,
   X,
 } from "lucide-react";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import DynamicForm from "./DynamicForm";
 
 const priorityStyles = {
@@ -398,7 +398,7 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
           textareaClass="w-full px-4 py-2 border border-purple-200 rounded-lg"
           selectClass={`w-full px-4 py-2 border rounded-lg ${priorityStyles[taskData.priority]}`}
           radioGroupClass="flex gap-4"
-          buttonClass="w-full bg-purple-600 text-white py-2 rounded-lg"
+          buttonClass="w-full bg-linear-to-r from-fuchsia-500 to-purple-600 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-all duration-200"
           ButtonIcon={taskData.id ? PlusCircle : Save}
         />
       </div>
