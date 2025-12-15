@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext.jsx";
 import apiPublic from "../../api/api";
 import { toast } from "react-toastify";
+import DynamicForm from "../../components/DynamicForm.jsx";
 
 function LoginPage() {
   // const [email, setEmail] = useState("");
@@ -16,6 +17,23 @@ function LoginPage() {
   });
 
   const { setAuthToken } = useContext(AuthContext);
+
+  const formFields = [
+    {
+      type: "email",
+      name: "email",
+      label: "Email Address",
+      placeholder: "Enter your email",
+      required: true,
+    },
+    {
+      type: "password",
+      name: "password",
+      label: "Password",
+      placeholder: "Enter your password",
+      required: true,
+    },
+  ];
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,96 +64,6 @@ function LoginPage() {
   };
 
   return (
-    // <div className="h-full bg-gray-900">
-    //   <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-    //     <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-    //       <img
-    //         src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-    //         alt="Your Company"
-    //         className="mx-auto h-10 w-auto"
-    //       />
-    //       <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white">
-    //         Login in to your account
-    //       </h2>
-    //     </div>
-
-    //     <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    //       <form method="" onSubmit={handleSumbit} className="space-y-6">
-    //         <div>
-    //           <label
-    //             htmlFor="email"
-    //             className="block text-sm/6 font-medium text-gray-100"
-    //           >
-    //             Email address
-    //           </label>
-    //           <div className="mt-2">
-    //             <input
-    //               id="email"
-    //               type="email"
-    //               name="email"
-    //               required
-    //               value={formData.email}
-    //               onChange={handleChange}
-    //               autoComplete="email"
-    //               className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
-    //             />
-    //           </div>
-    //         </div>
-
-    //         <div>
-    //           <div className="flex items-center justify-between">
-    //             <label
-    //               htmlFor="password"
-    //               className="block text-sm/6 font-medium text-gray-100"
-    //             >
-    //               Password
-    //             </label>
-    //             <div className="text-sm">
-    //               <a
-    //                 href="#"
-    //                 className="font-semibold text-indigo-400 hover:text-indigo-300"
-    //               >
-    //                 Forgot password?
-    //               </a>
-    //             </div>
-    //           </div>
-    //           <div className="mt-2">
-    //             <input
-    //               id="password"
-    //               type="password"
-    //               name="password"
-    //               required
-    //               value={formData.password}
-    //               onChange={handleChange}
-    //               autoComplete="current-password"
-    //               className="block w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-white outline-1 -outline-offset-1 outline-white/10 placeholder:text-gray-500 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-500 sm:text-sm/6"
-    //             />
-    //           </div>
-    //         </div>
-
-    //         <div>
-    //           <button
-    //             type="submit"
-    //             className="flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-white hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
-    //           >
-    //             Log in
-    //           </button>
-    //         </div>
-    //       </form>
-
-    //       <p className="mt-10 text-center text-sm/6 text-gray-400">
-    //         Don't have an account?
-    //         <Link
-    //           to="/signup"
-    //           className="font-semibold text-indigo-400 hover:text-indigo-300"
-    //         >
-    //           Sign up
-    //         </Link>
-    //       </p>
-    //     </div>
-    //   </div>
-    // </div>
-
     <div className="min-h-screen bg-linear-to-br from-fuchsia-50 via-purple-50 to-blue-50 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
@@ -149,7 +77,7 @@ function LoginPage() {
               {error}
             </p>
           )}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="email"
@@ -196,7 +124,19 @@ function LoginPage() {
             >
               {loading ? "Logging in..." : "Log in"}
             </button>
-          </form>
+          </form> */}
+
+          <DynamicForm
+            fields={formFields}
+            values={formData}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            submitLabel="Log In"
+            formClass="space-y-4"
+            fieldWrapperClass="mb-4"
+            inputClass="block w-full rounded-lg border border-purple-100 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
+            buttonClass="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-linear-to-r from-fuchsia-500 via-purple-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:cursor-pointer transition-all disabled:opacity-60"
+          />
         </div>
         <p className="mt-6 text-center text-xs text-gray-500">
           Don't have an account? &nbsp;

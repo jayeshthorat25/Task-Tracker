@@ -9,7 +9,8 @@ class UserBase(BaseModel):
     role: Optional[UserRole] = UserRole.USER
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=6, description="Password must be at least 6 characters long")
+    # password: str = Field(..., min_length=6, description="Password must be at least 6 characters long")
+    password: str
     
 class UserLogin(BaseModel):
     email: EmailStr

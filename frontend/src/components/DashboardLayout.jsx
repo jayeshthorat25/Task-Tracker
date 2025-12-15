@@ -57,7 +57,7 @@ function Layout() {
       const dueDate = new Date(task.due_date);
       const now = new Date();
       now.setHours(0, 0, 0, 0);
-      console.log(dueDate, now);
+      // console.log(dueDate, now);
       return task.status !== "completed" && dueDate < now;
     }).length;
     return { total, completed, remaining, completionPercentage, overdue };
