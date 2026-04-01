@@ -323,13 +323,14 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
 
   if (!isOpen) return null;
 
-  const formFields = [
+  const formSchema = [
     {
       type: "text",
       name: "title",
       label: "Task Title",
       placeholder: "Enter task title",
       required: true,
+      className: "w-full px-4 py-2 border border-purple-200 rounded-lg",
     },
     {
       type: "textarea",
@@ -337,12 +338,17 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
       label: "Description",
       icon: AlignLeft,
       placeholder: "Enter description",
+      rows: 2,
+      className: "w-full px-4 py-2 border border-purple-200 rounded-lg",
     },
     {
       type: "select",
       name: "priority",
       label: "Priority",
       icon: Flag,
+      className: `w-full px-4 py-2 border rounded-lg ${
+        priorityStyles[taskData.priority]
+      }`,
       options: [
         { label: "Low", value: "low", className: priorityStyles.low },
         { label: "Medium", value: "medium", className: priorityStyles.medium },
@@ -355,12 +361,14 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
       label: "Due Date",
       icon: Calendar,
       min: taskToEdit ? taskToEdit.due_date : today,
+      className: "w-full px-4 py-2 border border-purple-200 rounded-lg",
     },
     {
       type: "radio-group",
       name: "completed",
       label: "Status",
       icon: CheckCircle,
+      radioGroupClass: "flex gap-4",
       options: [
         { value: "pending", label: "Pending" },
         { value: "in_progress", label: "In Progress" },
@@ -371,11 +379,11 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
 
   return (
     <div className="fixed inset-0 backdrop-blur-sm bg-black/20 z-50 flex items-center justify-center p-4">
-       <div className="bg-white border border-purple-100 rounded-xl max-w-md w-full shadow-lg relative p-6 animate-fadeIn">
-         <div className="flex justify-between items-center mb-6">
-           <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-             {taskData.id ? "Edit Task" : "Create New Task"}
-           </h2>
+      <div className="bg-white border border-purple-100 rounded-xl max-w-md w-full shadow-lg relative p-6 animate-fadeIn">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+            {taskData.id ? "Edit Task" : "Create New Task"}
+          </h2>
 
           <button
             onClick={() => onClose()}
@@ -387,18 +395,14 @@ function TaskModal({ isOpen, onClose, taskToEdit, onSave }) {
 
         {/* ---------- Dynamic Form ---------- */}
         <DynamicForm
-          fields={formFields}
+          schema={formSchema}
           values={taskData}
           onChange={handleChange}
           onSubmit={handleSubmit}
           submitLabel={taskData.id ? "Update Task" : "Create Task"}
           formClass="space-y-4"
           fieldWrapperClass="mb-4"
-          inputClass="w-full px-4 py-2 border border-purple-200 rounded-lg"
-          textareaClass="w-full px-4 py-2 border border-purple-200 rounded-lg"
-          selectClass={`w-full px-4 py-2 border rounded-lg ${priorityStyles[taskData.priority]}`}
-          radioGroupClass="flex gap-4"
-          buttonClass="w-full bg-linear-to-r from-fuchsia-500 to-purple-600 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-all duration-200"
+          buttonClass="w-full bg-linear-to-r from-fuchsia-500 to-purple-600 text-white py-2.5 px-4 rounded-lg flex items-center justify-center gap-2"
           ButtonIcon={taskData.id ? PlusCircle : Save}
         />
       </div>

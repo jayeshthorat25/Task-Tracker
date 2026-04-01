@@ -18,13 +18,16 @@ function LoginPage() {
 
   const { setAuthToken } = useContext(AuthContext);
 
-  const formFields = [
+  /* Form Schema */
+  const loginSchema = [
     {
       type: "email",
       name: "email",
       label: "Email Address",
       placeholder: "Enter your email",
       required: true,
+      className:
+        "block w-full rounded-lg border border-purple-100 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none",
     },
     {
       type: "password",
@@ -32,6 +35,8 @@ function LoginPage() {
       label: "Password",
       placeholder: "Enter your password",
       required: true,
+      className:
+        "block w-full rounded-lg border border-purple-100 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none",
     },
   ];
 
@@ -127,15 +132,15 @@ function LoginPage() {
           </form> */}
 
           <DynamicForm
-            fields={formFields}
+            schema={loginSchema}
             values={formData}
             onChange={handleChange}
             onSubmit={handleSubmit}
-            submitLabel="Log In"
+            loading={loading}
+            submitLabel={loading ? "Logging in..." : "Log In"}
             formClass="space-y-4"
             fieldWrapperClass="mb-4"
-            inputClass="block w-full rounded-lg border border-purple-100 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
-            buttonClass="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-linear-to-r from-fuchsia-500 via-purple-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:cursor-pointer transition-all disabled:opacity-60"
+            buttonClass="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-linear-to-r from-fuchsia-500 via-purple-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all disabled:opacity-60"
           />
         </div>
         <p className="mt-6 text-center text-xs text-gray-500">

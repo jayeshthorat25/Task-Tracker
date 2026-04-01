@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 
-import Layout from "./components/DashboardLayout";
+import Layout from "./components/Layout";
 import Dashboard from "./pages/user/CurrentUserTasks.jsx";
 import RemainingPage from "./pages/user/RemainingPage.jsx";
 import CompletedPage from "./pages/user/CompletedPage.jsx";
