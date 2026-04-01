@@ -12,11 +12,11 @@ function PublicRoutes() {
   }
 
   if (user && user.role === "user") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/user/dashboard" replace />;
   }
 
   if (user && user.role === "admin") {
-    return <Navigate to="/admin/tasks" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   // If no user logged in → allow access to public routes (login/register pages)
