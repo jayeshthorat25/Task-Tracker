@@ -1,38 +1,33 @@
-import { CalendarIcon, Filter, HomeIcon, Plus, Search } from "lucide-react";
-import React, { useCallback, useMemo, useState, useEffect } from "react";
+import { HomeIcon, Search, CalendarIcon } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
 import api from "../../api/api";
 import UserCard from "../../components/UserCard";
+import useDebounce from "../../hooks/useDebounce";
 
 function AllUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
 
-  const fetchUsers = useCallback(async () => {
+  // Debounced search value
+  const debouncedSearch = useDebounce(search, 500);
+
+  const fetchUsers = async (query = "") => {
     setLoading(true);
     try {
-      const response = await  api.get("/admin/all_users");
-      setUsers(response.data);
+      const response = await api.get(`/admin/all_users?search=${query}`);
+      setUsers(response.data || []);
     } catch (error) {
       console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
+  // Fetch users initially and when search changes (debounced)
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
-
-  // Search filter
-  const filteredUsers = useMemo(() => {
-    const query = search.toLowerCase();
-    return users.filter(
-      (user) =>
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query)
-    );
-  }, [users, search]);
+    fetchUsers(debouncedSearch);
+  }, [debouncedSearch]);
 
   return (
     <div className="p-4 md:p-6 min-h-screen overflow-hidden">
@@ -65,7 +60,7 @@ function AllUsers() {
       <div className="space-y-4">
         {loading ? (
           <div className="text-center py-6 text-gray-500">Loading users...</div>
-        ) : filteredUsers.length === 0 ? (
+        ) : users.length === 0 ? (
           <div className="p-6 bg-white rounded-xl shadow-sm border border-purple-100 text-center">
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CalendarIcon className="w-8 h-8 text-purple-500" />
@@ -78,7 +73,7 @@ function AllUsers() {
             </p>
           </div>
         ) : (
-          filteredUsers.map((user) => <UserCard key={user.id} user={user} />)
+          users.map((user) => <UserCard key={user.id} user={user} />)
         )}
       </div>
     </div>

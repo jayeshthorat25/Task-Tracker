@@ -35,8 +35,8 @@ function LoginPage() {
       setAuthToken(response.data.accessToken, response.data.user);
       toast.success("Login successful!");
       if (response.data.user.role === "admin")
-        navigate("/admin/tasks", { replace: true });
-      else navigate("/", { replace: true });
+        navigate("/admin/dashboard", { replace: true });
+      else navigate("/user/dashboard", { replace: true });
     } catch (error) {
       if (error.response) setError(error.response.data.detail);
       else setError(error.message);

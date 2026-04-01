@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const token = await getAccessToken();
-      console.log("Token refreshed:", token);
+      // console.log("Token refreshed:", token);
       setAuthToken(token);
     } catch (error) {
       console.error("Error refreshing token:", error);
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await api.get("/auth/me");
       const user = response.data;
-      console.log("Fetched user after token refresh:", user);
+      // console.log("Fetched user after token refresh:", user);
       setUser(user);
       // Store updated values
       // localStorage.setItem("user", JSON.stringify(user));

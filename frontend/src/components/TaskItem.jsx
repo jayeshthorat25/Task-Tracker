@@ -4,22 +4,24 @@ import {
   MoreVertical,
   Trash2,
   ChevronDown,
+  AlertTriangle,
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
-import { format, isToday, set } from "date-fns";
+import { format, isBefore, isToday, set } from "date-fns";
 import api from "../api/api";
 import TaskModal from "./TaskModal";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-function TaskItem({ task, onRefresh, onEdit}) {
-
+function TaskItem({ task, onRefresh, onEdit }) {
   const { user } = useContext(AuthContext);
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [status, setStatus] = useState(task.status);
   const [ownerName, setOwnerName] = useState("");
+  const navigate = useNavigate();
 
   const borderColor =
     status === "completed"
@@ -32,16 +34,13 @@ function TaskItem({ task, onRefresh, onEdit}) {
     setStatus(task.status);
   }, [task.status]);
 
-
   useEffect(() => {
     const fetchOwner = async () => {
       if (!task.created_by) return;
       if (user.role !== "admin") return;
 
       try {
-        const res = await api.get(
-          `/admin/user/${task.created_by}`
-        );
+        const res = await api.get(`/admin/user/${task.created_by}`);
         setOwnerName(res.data.name);
       } catch (error) {
         console.error("Failed to fetch task owner:", error);
@@ -68,10 +67,7 @@ function TaskItem({ task, onRefresh, onEdit}) {
 
     try {
       // const updatedTask = { ...task, status: newStatus };
-      await api.patch(
-        `/users/tasks/${task.id}`,
-        { status: newStatus }
-      );
+      await api.patch(`/users/tasks/${task.id}`, { status: newStatus });
 
       setStatus(newStatus);
       onRefresh();
@@ -80,42 +76,77 @@ function TaskItem({ task, onRefresh, onEdit}) {
     }
   };
 
-  const handleDelete = async () => {
+  // const handleDelete = async () => {
+  //   setShowMenu(false);
+  //   if (!confirm("Are you sure you want to delete this task?")) {
+  //     return;
+  //   }
 
-    setShowMenu(false);
-    if (!confirm("Are you sure you want to delete this task?")) {
-      return;
-    }
-
-    try {
-      await api.delete(
-        `/users/tasks/${task.id}`
-      );
-      onRefresh();
-    } catch (error) {
-      console.error("Error deleting task:", error);
-      toast.error("Failed to delete task. Please try again.");
-    }
-  };
+  //   try {
+  //     await api.delete(`/users/tasks/${task.id}`);
+  //     onRefresh();
+  //   } catch (error) {
+  //     console.error("Error deleting task:", error);
+  //     toast.error("Failed to delete task. Please try again.");
+  //   }
+  // };
 
   const handleSave = async (updatedTask) => {
     setShowEditModal(false);
     try {
-      await api.put(
-        `/users/tasks/${updatedTask.id}`,
-        updatedTask
-      );
+      await api.put(`/users/tasks/${updatedTask.id}`, updatedTask);
       onRefresh();
     } catch (error) {
       console.error("Error updating task:", error);
     }
   };
 
+  const displayDueDate = () => {
+    if (!task?.due_date)
+      return <span className="text-gray-400 italic">No Due Date</span>;
+
+    const dueDate = new Date(task.due_date);
+    const today = new Date();
+    const isCompleted = task.status?.toLowerCase() === "completed";
+
+    if (isToday(dueDate)) {
+      return (
+        <span className="text-orange-500 font-medium flex items-center gap-1">
+          <AlertTriangle size={16} className="text-orange-500" />
+          Due Today
+        </span>
+      );
+    }
+
+    if (isBefore(dueDate, today) && !isCompleted) {
+      return (
+        <span className="text-red-600 font-semibold flex items-center gap-1">
+          <AlertTriangle size={18} className="text-red-600" />
+          Overdue - {format(dueDate, "MMM d, yyyy")}
+        </span>
+      );
+    }
+
+    return (
+      <span className="text-blue-500 font-medium">
+        Due {format(dueDate, "MMM d, yyyy")}
+      </span>
+    );
+  };
+
   return (
     <>
       <div
         className={`group p-4 sm:p-5 rounded-xl shadow-sm bg-white border-l-4 hover:shadow-md transition-all duration-300 border ${borderColor}`}
+        onClick={() => {
+          if (user.role === "user") {
+            navigate(`/user/tasks/${task.id}`);
+          } else if (user.role === "admin") {
+            navigate(`/admin/tasks/${task.id}`);
+          }
+        }}
       >
+        {/* {console.log("Rendering task:", task.id)} */}
         <div className="flex items-start justify-between gap-4">
           {/* LEFT CONTENT */}
           <div className="min-w-0 flex-1">
@@ -144,9 +175,7 @@ function TaskItem({ task, onRefresh, onEdit}) {
             </div>
 
             {task.description && (
-              <p className="text-sm text-gray-500 mt-1 truncate">
-                {task.description}
-              </p>
+              <p className="text-sm text-gray-500 mt-1 ">{task.description}</p>
             )}
 
             {/* STATUS */}
@@ -164,75 +193,72 @@ function TaskItem({ task, onRefresh, onEdit}) {
 
           {/* RIGHT SIDE MENU */}
           <div className="flex flex-col items-end gap-2 sm:gap-3">
-
-
             {/* STATUS DROPDOWN */}
-                          {(user.id === task.created_by) && (
-            <div className="relative">
-              <button
-                onClick={() => setStatusMenuOpen(!statusMenuOpen)}
-                className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-purple-100 rounded-lg flex items-center gap-1 transition"
-              >
-                Set Status <ChevronDown size={14} />
-              </button>
+            {/* {user.id === task.created_by && (
+              <div className="relative">
+                <button
+                  onClick={() => setStatusMenuOpen(!statusMenuOpen)}
+                  className="px-3 py-1.5 text-xs bg-gray-100 hover:bg-purple-100 rounded-lg flex items-center gap-1 transition"
+                >
+                  Set Status <ChevronDown size={14} />
+                </button>
 
-              {statusMenuOpen && (
-                <div className="absolute right-0 mt-1 w-40 bg-white border border-purple-100 rounded-xl shadow-lg z-10 overflow-hidden">
-                  {Object.keys(STATUS_LABELS).map((key) => (
+                {statusMenuOpen && (
+                  <div className="absolute right-0 mt-1 w-40 bg-white border border-purple-100 rounded-xl shadow-lg z-10 overflow-hidden">
+                    {Object.keys(STATUS_LABELS).map((key) => (
+                      <button
+                        key={key}
+                        onClick={() => handleStatusChange(key)}
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 transition"
+                      >
+                        {STATUS_LABELS[key]}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )} */}
+            {/* {user.id === task.created_by && (
+              <div className="relative">
+                <button
+                  onClick={() => setShowMenu(!showMenu)}
+                  className="p-1 sm:p-1.5 hover:bg-purple-100 rounded-lg text-gray-500 hover:text-purple-700 transition"
+                >
+                  <MoreVertical size={18} />
+                </button>
+
+                {showMenu && (
+                  <div className="absolute right-0 mt-1 w-40 sm:w-48 bg-white border border-purple-100 rounded-xl shadow-lg z-10 overflow-hidden">
                     <button
-                      key={key}
-                      onClick={() => handleStatusChange(key)}
-                      className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 transition"
+                      onClick={() => {
+                        setShowMenu(false);
+                        setShowEditModal(true);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 flex items-center gap-2"
                     >
-                      {STATUS_LABELS[key]}
+                      <Edit2 size={14} className="text-purple-600" />
+                      Edit Task
                     </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            )}
-            {(user.id === task.created_by) && (
-            <div className="relative">
-              <button
-                onClick={() => setShowMenu(!showMenu)}
-                className="p-1 sm:p-1.5 hover:bg-purple-100 rounded-lg text-gray-500 hover:text-purple-700 transition"
-              >
-                <MoreVertical size={18} />
-              </button>
 
-              {showMenu && (
-                <div className="absolute right-0 mt-1 w-40 sm:w-48 bg-white border border-purple-100 rounded-xl shadow-lg z-10 overflow-hidden">
-                  <button
-                    onClick={() => {
-                      setShowMenu(false);
-                      setShowEditModal(true);
-                    }}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 flex items-center gap-2"
-                  >
-                    <Edit2 size={14} className="text-purple-600" />
-                    Edit Task
-                  </button>
-
-                  <button
-                    onClick={handleDelete}
-                    className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 flex items-center gap-2"
-                  >
-                    <Trash2 size={14} className="text-red-600" />
-                    Delete Task
-                  </button>
-                </div>
-              )}
-            </div>
-            )}
+                    <button
+                      onClick={handleDelete}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-purple-50 flex items-center gap-2"
+                    >
+                      <Trash2 size={14} className="text-red-600" />
+                      Delete Task
+                    </button>
+                  </div>
+                )}
+              </div>
+            )} */}
 
             {/* DUE DATE */}
             <div className="flex items-center gap-1.5 text-xs font-medium whitespace-nowrap text-gray-500">
               <Calendar size={14} />
-              {task.due_date
-                ? isToday(new Date(task.due_date))
-                  ? "Due Today"
-                  : `Due ${format(new Date(task.due_date), "MMM d, yyyy")}`
-                : "No Due Date"}
+              <div className="flex items-center gap-2 text-gray-700 text-sm">
+                <span>Due Date:</span>
+                {displayDueDate()}
+              </div>
             </div>
           </div>
         </div>

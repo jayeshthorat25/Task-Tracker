@@ -18,7 +18,15 @@ function RemainingPage() {
   const [showModal, setShowModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  const FILTER_OPTIONS = ["all", "today", "week", "high", "medium", "low"];
+  const FILTER_OPTIONS = [
+    { value: "all", label: "All Tasks" },
+    { value: "today", label: "Today" },
+    { value: "week", label: "This Week" },
+    { value: "high", label: "High Priority" },
+    { value: "medium", label: "Medium Priority" },
+    { value: "low", label: "Low Priority" },
+  ];
+
   const FILTER_LABELS = {
     all: "All Tasks",
     today: "Today's Tasks",
@@ -108,7 +116,7 @@ function RemainingPage() {
 
   const handleTaskSave = useCallback(async (task) => {
     try {
-      await  api.post(`/users/tasks`, task);
+      await api.post(`/users/tasks`, task);
       refreshTasks();
       setShowModal(false);
       setSelectedTask(null);
@@ -138,57 +146,43 @@ function RemainingPage() {
       </div>
 
       {/* STATS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {STATS.map(({ key, label, icon: Icon, iconColor, valueKey }) => (
-          <div
-            key={key}
-            className={`p-4 rounded-xl bg-white shadow-sm border ${iconColor}`}
-          >
-            <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${iconColor}`}>
-                <Icon className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-lg font-bold">{stats[valueKey]}</p>
-                <p className="text-xs text-gray-500">{label}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
 
       {/* FILTER */}
-      <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm mb-4">
-        <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-purple-500" />
-          <h2 className="font-semibold text-gray-800">
+      <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
+        {/* Left Label */}
+        <div className="flex items-center gap-2 min-w-0">
+          <Filter className="w-5 h-5 text-purple-500 shrink-0" />
+          <h2 className="text-base md:text-lg font-semibold text-gray-800 truncate">
             {FILTER_LABELS[filter]}
           </h2>
         </div>
+
+        {/* Mobile Dropdown */}
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-3 py-2 border rounded-lg md:hidden text-sm"
+          className="px-3 py-2 border border-purple-100 rounded-lg focus:ring-2 focus:ring-purple-500 md:hidden text-sm"
         >
-          {FILTER_OPTIONS.map((opt) => (
-            <option key={opt} value={opt}>
-              {opt.charAt(0).toUpperCase() + opt.slice(1)}
+          {FILTER_OPTIONS.map(({ value, label }) => (
+            <option key={value} value={value}>
+              {label}
             </option>
           ))}
         </select>
 
-        <div className="hidden md:flex space-x-1">
-          {FILTER_OPTIONS.map((opt) => (
+        {/* Desktop Buttons */}
+        <div className="hidden md:flex space-x-1 bg-purple-50 p-1 rounded-lg">
+          {FILTER_OPTIONS.map(({ value, label }) => (
             <button
-              key={opt}
-              onClick={() => setFilter(opt)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium ${
-                filter === opt
+              key={value}
+              onClick={() => setFilter(value)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                filter === value
                   ? "bg-white text-purple-700 shadow-sm border"
                   : "text-gray-600 hover:bg-purple-100/50"
               }`}
             >
-              {opt.charAt(0).toUpperCase() + opt.slice(1)}
+              {label}
             </button>
           ))}
         </div>
