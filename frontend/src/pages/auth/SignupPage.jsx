@@ -16,13 +16,19 @@ function SignupPage() {
 
   const navigate = useNavigate();
 
-  const formFields = [
+  /* Shared input styles */
+  const baseInputClass =
+    "block w-full rounded-lg border border-purple-100 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none";
+
+  /* Form Schema */
+  const signupSchema = [
     {
       type: "text",
       name: "name",
       label: "Name",
-      placeholder: "Enter your Name",
+      placeholder: "Enter your name",
       required: true,
+      className: baseInputClass,
     },
     {
       type: "email",
@@ -30,6 +36,7 @@ function SignupPage() {
       label: "Email Address",
       placeholder: "Enter your email",
       required: true,
+      className: baseInputClass,
     },
     {
       type: "password",
@@ -37,6 +44,7 @@ function SignupPage() {
       label: "Password",
       placeholder: "Enter your password",
       required: true,
+      className: baseInputClass,
     },
     {
       type: "password",
@@ -44,6 +52,7 @@ function SignupPage() {
       label: "Confirm Password",
       placeholder: "Confirm your password",
       required: true,
+      className: baseInputClass,
     },
   ];
 
@@ -60,13 +69,12 @@ function SignupPage() {
     setError(null);
     setLoading(true);
     try {
-
       if (!validatePassword()) {
         setError("Passwords do not match");
         setLoading(false);
         return;
       }
-      console.log(formData)
+      console.log(formData);
       const response = await apiPublic.post("/auth/signup", formData);
       // console.log(response.data);
       // console.log("User registered successfully");
@@ -82,10 +90,9 @@ function SignupPage() {
 
   const validatePassword = () => {
     return formData.password === formData.confirmPassword;
-  }
+  };
 
   return (
-
     <div className="min-h-screen bg-linear-to-br from-fuchsia-50 via-purple-50 to-blue-50 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
@@ -191,17 +198,16 @@ function SignupPage() {
           </form> */}
 
           <DynamicForm
-            fields={formFields}
+            schema={signupSchema}
             values={formData}
             onChange={handleChange}
             onSubmit={handleSubmit}
-            submitLabel="Log In"
+            loading={loading}
+            submitLabel={loading ? "Signing up..." : "Sign Up"}
             formClass="space-y-4"
             fieldWrapperClass="mb-4"
-            inputClass="block w-full rounded-lg border border-purple-100 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none"
-            buttonClass="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-linear-to-r from-fuchsia-500 via-purple-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md hover:cursor-pointer transition-all disabled:opacity-60"
+            buttonClass="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-linear-to-r from-fuchsia-500 via-purple-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-all disabled:opacity-60"
           />
-
         </div>
         <p className="mt-6 text-center text-xs text-gray-500">
           Already have an account? &nbsp;
